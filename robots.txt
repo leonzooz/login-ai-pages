@@ -1,0 +1,7 @@
+# robots.txt for loginai.io
+# All AI crawlers are allowed via Cloudflare WAF rule
+
+User-agent: *
+Allow: /
+
+Sitemap: https://loginai.io/sitemap.xml
