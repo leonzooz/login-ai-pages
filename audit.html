@@ -244,6 +244,14 @@ function render(r) {
           <p><span>為什麼重要</span>${esc(f.why)}</p></div></article>`).join("")
     : '<p class="lead">三軸都沒有偵測到需要優先處理的問題。下一步的差異會出現在答案面與第三方佐證，那需要固定題庫的跨平台採樣。</p>';
 
+  // 鉤子接著讀者剛看到的結果講，而不是一段跟他無關的推銷。
+  // 挑他分數最低的那一軸點名，因為那正是他最想知道別人幾分的地方。
+  const measured = axes.filter((a) => a.measured);
+  const weakest = measured.reduce((a, b) => (b.score < a.score ? b : a), measured[0]);
+  const weakLine = weakest
+    ? `其中「${esc(weakest.name)}」只有 ${weakest.score} 分。`
+    : "";
+
   const s = r.stats;
   $("#out").innerHTML = `
     <div class="printonly" style="border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:14px">
@@ -284,15 +292,13 @@ function render(r) {
     <h2>發現</h2>
     ${findings}
 
-    <div class="bd">
-      <h3>本次邊界</h3>
-      <ul>${r.boundary.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
-    </div>
-
     <section class="hook">
-      <h2>你的競爭對手，在同一把尺上幾分？</h2>
-      <p class="sub">同樣的三軸、同樣的檢測流程，套用到你指定的競爭對手網域，產出一份對照報告 ——
-        告訴你落後在哪一軸、落後幾分、以及該先修哪一項。付款後約 1 分鐘寄到你信箱，連結永久保留。</p>
+      <h2>那你的競爭對手呢？</h2>
+      <p class="sub">你現在知道自己 ${r.overall} 分，${weakLine}
+        但這個數字要有意義，得有比較對象 —— 落後 15 分和領先 15 分，該做的事完全不同。</p>
+      <p class="sub">填入競爭對手的網域，我們用<strong style="color:var(--ink)">完全相同的三軸與檢測流程</strong>各跑一次，
+        產出一份對照報告：你落後在哪一軸、落後幾分、誰是那一軸的領先者、該先修哪一項。
+        付款後約 1 分鐘寄到你信箱，連結永久保留。</p>
 
       <div class="comp" id="comp"></div>
       <button type="button" class="addbtn" id="addComp">＋ 再加一個競爭對手</button>
@@ -320,6 +326,11 @@ function render(r) {
         競品檢測只讀取各網域的公開資料（首頁、robots.txt、sitemap.xml、llms.txt），不登入、不修改、不深度爬取。
       </p>
     </section>
+
+    <div class="bd">
+      <h3>本次邊界</h3>
+      <ul>${r.boundary.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+    </div>
 
     <p class="cta">這份即時檢測只回答「AI 進不進得來、讀不讀得懂」。<br>
       至於 AI 現在實際怎麼回答關於你的問題、競品拿走了哪些答案，需要固定題庫的跨平台採樣，屬於我們的付費診斷服務。
@@ -411,6 +422,19 @@ function initHook(host) {
     }
   });
 }
+
+/* ---------------------------------------------- 從首頁帶網域進來就直接開跑 */
+
+// 首頁的 CTA 收到網域後導到 /audit.html?domain=xxx。使用者在首頁已經按過一次
+// Enter，這裡不該叫他再按一次 —— 直接填入並送出。
+(function autorun() {
+  const q = new URLSearchParams(location.search).get("domain");
+  if (!q) return;
+  const d = q.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(d)) return;
+  $("#d").value = d;
+  $("#f").dispatchEvent(new Event("submit", { cancelable: true }));
+})();
 </script>
 </body>
 </html>

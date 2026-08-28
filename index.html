@@ -2159,9 +2159,12 @@ img, svg, video, canvas { max-width:100%; }
         e.preventDefault();
         var v=input.value.trim();
         if(!v){ status.textContent='請先貼上你的網址。'; return; }
-        v=v.replace(/^https?:\/\//,'').replace(/\/.*$/,'').replace(/</g,'&lt;');
-        status.innerHTML='✓ 已收到 <b style="color:#4DA6FF">'+v+'</b>——正在看 AI 眼中的你，完成後第一時間通知你。';
+        v=v.replace(/^https?:\/\//,'').replace(/\/.*$/,'').trim();
+        if(!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v)){ status.textContent='網址看起來不太對，例如 example.com'; status.style.opacity=1; return; }
+        status.innerHTML='正在檢測 <b style="color:#4DA6FF">'+v.replace(/</g,'&lt;')+'</b>…';
         status.style.opacity=1;
+        // 帶著網域跳到檢測頁，那邊會自動開跑 —— 使用者只需要按一次 Enter
+        window.location.href='/audit.html?domain='+encodeURIComponent(v);
       });
     }
   });
@@ -2237,10 +2240,11 @@ img, svg, video, canvas { max-width:100%; }
 
     v = v.replace(/^https?:\/\//,'').replace(/\/.*$/,'').replace(/</g,'&lt;');
     if(status){
-      status.innerHTML = '✓ 已收到 <b style="color:#8fb9ff">' + v + '</b>，正在看 AI 眼中的你。';
+      status.innerHTML = '正在檢測 <b style="color:#8fb9ff">' + v.replace(/</g,'&lt;') + '</b>…';
       status.classList.add('show');
-      setTimeout(function(){ status.classList.remove('show'); }, 3600);
     }
+    // 帶著網域跳到檢測頁，那邊會自動開跑
+    window.location.href = '/audit.html?domain=' + encodeURIComponent(v);
   });
 })();
 </script>
