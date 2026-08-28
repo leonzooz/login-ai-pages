@@ -71,6 +71,33 @@ h2{font:500 clamp(22px,2.6vw,32px)/1.25 "Noto Serif TC",Georgia,serif;margin:52p
 .bd li::marker{color:var(--gold)}
 .cta{margin-top:44px;border-top:1px solid var(--line);padding-top:30px;color:var(--muted);font-size:15px}
 .cta a{color:var(--ink);text-decoration-color:var(--gold);text-underline-offset:4px}
+.hook{margin-top:52px;border:1px solid var(--gold);padding:clamp(22px,4vw,34px)}
+.hook h2{margin:0 0 12px}
+.hook .sub{color:var(--muted);font-size:15px;line-height:1.75;margin:0 0 24px;max-width:60ch}
+.comp{display:grid;gap:10px;margin-bottom:8px}
+.comp-row{display:flex;gap:10px;align-items:center}
+.comp-row input{flex:1 1 auto;min-width:0;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:15px;padding:12px 14px}
+.comp-row input:focus{outline:none;border-color:var(--gold)}
+.comp-row button{background:none;border:1px solid var(--line);color:var(--muted);font-size:18px;line-height:1;width:42px;height:44px;padding:0;cursor:pointer;flex:0 0 auto}
+.comp-row button:hover{border-color:var(--red);color:var(--red)}
+.addbtn{background:none;border:1px dashed rgba(232,225,210,.42);color:var(--muted);font:inherit;font-size:14px;padding:11px 18px;cursor:pointer;margin-bottom:22px}
+.addbtn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.addbtn:disabled{opacity:.35;cursor:default}
+.priceline{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;border-top:1px solid var(--line);padding-top:20px;margin-bottom:20px}
+.priceline .amt{font:500 clamp(38px,6vw,54px)/1 "Noto Serif TC",Georgia,serif;color:var(--teal)}
+.priceline .per{color:var(--muted);font-size:13px}
+.ladder{color:var(--foot);font:11px "IBM Plex Mono",ui-monospace,monospace;margin:0 0 22px}
+.ladder b{color:var(--gold)}
+.buyrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.buyrow input[type=email]{flex:1 1 260px;min-width:0;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:15px;padding:14px}
+.buyrow input[type=email]:focus{outline:none;border-color:var(--gold)}
+.buyrow button{background:var(--gold);border:0;color:#100c04;font:700 16px "Noto Sans TC",sans-serif;padding:14px 30px;cursor:pointer}
+.buyrow button:hover:not(:disabled){background:#cdb078}
+.buyrow button:disabled{opacity:.5;cursor:default}
+.consent{display:flex;gap:9px;align-items:flex-start;margin-top:18px;color:var(--muted);font-size:12.5px;line-height:1.6;max-width:64ch}
+.consent input{margin-top:3px;flex:0 0 auto}
+.fineprint{color:var(--foot);font-size:11.5px;line-height:1.7;margin-top:18px;max-width:64ch}
+.fineprint a{color:var(--muted);text-decoration-color:var(--foot)}
 footer{color:var(--foot);font-size:11px;margin-top:64px}
 @media(max-width:720px){.top{grid-template-columns:1fr;gap:26px}.axis{grid-template-columns:108px 1fr 38px;gap:9px}.f{grid-template-columns:1fr;gap:8px}}
 </style>
@@ -202,10 +229,118 @@ function render(r) {
       <ul>${r.boundary.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
     </div>
 
+    <section class="hook">
+      <h2>你的競爭對手，在同一把尺上幾分？</h2>
+      <p class="sub">同樣的三軸、同樣的檢測流程，套用到你指定的競爭對手網域，產出一份對照報告 ——
+        告訴你落後在哪一軸、落後幾分、以及該先修哪一項。付款後約 1 分鐘寄到你信箱，連結永久保留。</p>
+
+      <div class="comp" id="comp"></div>
+      <button type="button" class="addbtn" id="addComp">＋ 再加一個競爭對手</button>
+
+      <div class="priceline">
+        <span class="amt" id="price">$3</span>
+        <span class="per" id="priceNote">1 個競爭對手 · 一次性付款，非訂閱</span>
+      </div>
+      <p class="ladder">1 個 <b>$3</b>　2 個 <b>$5</b>　3 個 <b>$7</b>　4 個 <b>$9</b>　5 個 <b>$11</b>　（USD，不含稅，最多 5 個）</p>
+
+      <div class="buyrow">
+        <input type="email" id="buyEmail" placeholder="收報告的信箱" autocomplete="email" aria-label="收報告的電子郵件">
+        <button type="button" id="buyBtn">前往結帳</button>
+      </div>
+      <p class="err" id="buyErr" role="alert"></p>
+
+      <label class="consent">
+        <input type="checkbox" id="consent">
+        <span>同意這份報告開放搜尋引擎索引。不勾選的話，報告頁預設不會被索引，只有拿到連結的人看得到。</span>
+      </label>
+
+      <p class="fineprint">
+        付款由 Waffo Pancake 處理，我們不接觸你的卡片資料。7 日內未開啟報告連結可全額退款。
+        詳見<a href="/terms-of-service.html">服務條款</a>與<a href="/privacy-policy.html">隱私政策</a>。<br>
+        競品檢測只讀取各網域的公開資料（首頁、robots.txt、sitemap.xml、llms.txt），不登入、不修改、不深度爬取。
+      </p>
+    </section>
+
     <p class="cta">這份即時檢測只回答「AI 進不進得來、讀不讀得懂」。<br>
       至於 AI 現在實際怎麼回答關於你的問題、競品拿走了哪些答案，需要固定題庫的跨平台採樣 —— 那是 PR2。
       想談的話寄信到 <a href="mailto:hello@loginai.io">hello@loginai.io</a>。</p>`;
+
+  initHook(r.host);
   $("#out").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ------------------------------------------------------------- 加購 */
+
+const PRICES = { 1: 3, 2: 5, 3: 7, 4: 9, 5: 11 };
+const MAX_COMP = 5;
+let auditedHost = "";
+
+function compRow(first) {
+  const row = document.createElement("div");
+  row.className = "comp-row";
+  row.innerHTML =
+    `<input type="text" inputmode="url" placeholder="競爭對手網域，例如 competitor.com" aria-label="競爭對手網域">` +
+    (first ? "" : `<button type="button" aria-label="移除">✕</button>`);
+  const del = row.querySelector("button");
+  if (del) del.addEventListener("click", () => { row.remove(); refreshPrice(); });
+  row.querySelector("input").addEventListener("input", refreshPrice);
+  return row;
+}
+
+function filledCompetitors() {
+  return [...document.querySelectorAll("#comp input")].map((i) => i.value.trim()).filter(Boolean);
+}
+
+// 價格只是顯示用，實際金額由伺服器依競品數重算，前端送什麼都不採信。
+function refreshPrice() {
+  const n = Math.min(MAX_COMP, Math.max(1, filledCompetitors().length || 1));
+  $("#price").textContent = "$" + PRICES[n];
+  $("#priceNote").textContent = `${n} 個競爭對手 · 一次性付款，非訂閱`;
+  $("#addComp").disabled = document.querySelectorAll("#comp input").length >= MAX_COMP;
+}
+
+function initHook(host) {
+  auditedHost = host;
+  const box = $("#comp");
+  box.innerHTML = "";
+  box.appendChild(compRow(true));
+  refreshPrice();
+
+  $("#addComp").addEventListener("click", () => {
+    if (document.querySelectorAll("#comp input").length >= MAX_COMP) return;
+    box.appendChild(compRow(false));
+    refreshPrice();
+    box.lastElementChild.querySelector("input").focus();
+  });
+
+  $("#buyBtn").addEventListener("click", async () => {
+    const competitors = filledCompetitors();
+    const email = $("#buyEmail").value.trim();
+    const err = $("#buyErr");
+    err.textContent = "";
+
+    if (!competitors.length) { err.textContent = "請至少填入一個競爭對手網域。"; return; }
+    if (competitors.length > MAX_COMP) { err.textContent = "一次最多 5 個競爭對手網域。"; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "請填入有效的電子郵件地址。"; return; }
+
+    $("#buyBtn").disabled = true;
+    $("#buyBtn").textContent = "建立結帳中…";
+    try {
+      const res = await fetch("/api/quote", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ domain: auditedHost, competitors, email, publicConsent: $("#consent").checked }),
+      });
+      const data = await res.json();
+      if (!data.ok) { err.textContent = data.error || "建立結帳失敗，請稍後再試。"; return; }
+      window.location.href = data.checkoutUrl;
+    } catch {
+      err.textContent = "連線失敗，請稍後再試。";
+    } finally {
+      $("#buyBtn").disabled = false;
+      $("#buyBtn").textContent = "前往結帳";
+    }
+  });
 }
 </script>
 </body>
