@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 能見度免費健檢｜LoginAi</title>
+<meta name="description" content="輸入網域，30 秒內取得 AI 入口可讀性、內容閱讀條件與官方身分資料三軸即時評分，以及具體的公開檢測證據。">
+<link rel="canonical" href="https://loginai.io/audit.html">
+<meta property="og:title" content="AI 能見度免費健檢｜LoginAi">
+<meta property="og:description" content="輸入網域，30 秒內取得三軸即時評分與公開檢測證據。">
+<meta property="og:url" content="https://loginai.io/audit.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#07172b;--navy2:#0b2643;--ink:#e8e1d2;--muted:#aeb9c6;--line:rgba(226,235,239,.17);--gold:#b89a62;--teal:#6eb4ac;--red:#cf7772;--paper:#f3efe6;--foot:#8e9aaa}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--navy);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.6}
+body{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px}
+.wrap{max-width:1120px;margin:0 auto;padding:clamp(32px,6vw,80px) clamp(20px,5vw,56px) 96px}
+.kicker{color:var(--gold);font:700 12px "IBM Plex Mono",ui-monospace,monospace;margin:0 0 18px;letter-spacing:.04em}
+h1{font:500 clamp(34px,5.4vw,64px)/1.08 "Noto Serif TC",Georgia,serif;margin:0 0 24px;max-width:16ch}
+.rule{width:96px;height:3px;background:var(--gold);margin:0 0 24px}
+.lead{max-width:62ch;color:var(--muted);font-size:clamp(16px,1.7vw,20px);line-height:1.75;margin:0 0 36px}
+form{display:flex;flex-wrap:wrap;gap:12px;max-width:680px;margin:0 0 14px}
+input[type=text]{flex:1 1 320px;min-width:0;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:16px;padding:15px 18px}
+input[type=text]:focus{outline:none;border-color:var(--gold)}
+input[type=text]::placeholder{color:#6f7d8c}
+button{background:var(--teal);border:0;color:#04121f;font:700 16px "Noto Sans TC",sans-serif;padding:15px 30px;cursor:pointer}
+button:hover:not(:disabled){background:#84c6bf}
+button:disabled{opacity:.5;cursor:default}
+.hint{color:var(--foot);font-size:12px;margin:0 0 8px}
+.err{color:var(--red);font-size:14px;min-height:20px;margin:6px 0 0}
+#out{margin-top:52px}
+.hidden{display:none}
+.pending{color:var(--muted);font-size:15px;display:flex;align-items:center;gap:12px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--teal);animation:p 1s infinite ease-in-out}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+.top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:44px;align-items:center;border-top:1px solid var(--line);padding-top:34px}
+.score{font:500 clamp(72px,12vw,132px)/.86 "Noto Serif TC",Georgia,serif;color:var(--teal)}
+.score.mid{color:var(--gold)}.score.low{color:var(--red)}
+.score-label{color:var(--muted);font-size:14px;margin-top:14px}
+.score-label b{color:var(--ink)}
+.axis{display:grid;grid-template-columns:150px 1fr 48px;align-items:center;gap:14px;margin:13px 0}
+.axis strong{font-size:14px}
+.axis .track{height:11px;border:1px solid var(--line);background:rgba(255,255,255,.035)}
+.axis .track i{display:block;height:100%;background:var(--teal)}
+.axis .track i.mid{background:var(--gold)}.axis .track i.low{background:var(--red)}
+.axis b{font:500 25px "Noto Serif TC",Georgia,serif;text-align:right}
+.axis.unmeasured strong,.axis.unmeasured b{color:var(--foot)}
+.axis.unmeasured .track{border-style:dashed}
+.axis .note{grid-column:1/-1;color:var(--foot);font-size:11px;margin-top:-6px}
+h2{font:500 clamp(22px,2.6vw,32px)/1.25 "Noto Serif TC",Georgia,serif;margin:52px 0 20px}
+.f{border-top:1px solid var(--line);padding:20px 0;display:grid;grid-template-columns:76px minmax(0,1fr);gap:20px}
+.lv{font:700 11px "IBM Plex Mono",monospace;padding-top:3px}
+.lv.high{color:var(--red)}.lv.medium{color:var(--gold)}.lv.low{color:var(--teal)}
+.f h3{font-size:17px;margin:0 0 9px}
+.f p{margin:0 0 7px;color:var(--muted);font-size:14px}
+.f p span{color:var(--gold);font-weight:700;font-size:11px;letter-spacing:.06em;margin-right:8px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.grid3 div{background:var(--navy2);padding:18px}
+.grid3 dt{color:var(--foot);font-size:11px;font-weight:700;letter-spacing:.06em}
+.grid3 dd{margin:6px 0 0;font:500 21px "Noto Serif TC",Georgia,serif}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{border:1px solid var(--line);padding:5px 11px;font-size:12px;color:var(--muted)}
+.bd{border:1px solid var(--gold);padding:26px;margin-top:52px}
+.bd h3{color:var(--gold);margin:0 0 14px;font-size:16px}
+.bd li{color:var(--muted);font-size:13.5px;margin:8px 0}
+.bd li::marker{color:var(--gold)}
+.cta{margin-top:44px;border-top:1px solid var(--line);padding-top:30px;color:var(--muted);font-size:15px}
+.cta a{color:var(--ink);text-decoration-color:var(--gold);text-underline-offset:4px}
+footer{color:var(--foot);font-size:11px;margin-top:64px}
+@media(max-width:720px){.top{grid-template-columns:1fr;gap:26px}.axis{grid-template-columns:108px 1fr 38px;gap:9px}.f{grid-template-columns:1fr;gap:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">LOGINAI / PR1 免費健檢</p>
+  <h1>你的網站，AI 讀得到嗎？</h1>
+  <div class="rule"></div>
+  <p class="lead">輸入網域，我們用公開可驗證的方式檢查三件事：AI 爬蟲進不進得來、內容能不能被讀懂、有沒有一張機器看得懂的官方身分卡。不需要任何後台權限。</p>
+
+  <form id="f" novalidate>
+    <input id="d" type="text" inputmode="url" autocomplete="url" placeholder="example.com" aria-label="要檢測的網域">
+    <button id="b" type="submit">開始檢測</button>
+  </form>
+  <p class="hint">只檢查公開網站。不會登入、不會修改、不會留存你的網站內容。</p>
+  <p class="err" id="e" role="alert"></p>
+
+  <div id="out"></div>
+
+  <footer>LoginAi · PR1 免費健檢 · 本頁不索引任何受檢網站的內容</footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const band = (n) => (n >= 75 ? "" : n >= 50 ? "mid" : "low");
+const LV = { high: "高風險", medium: "中風險", low: "建議" };
+
+$("#f").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const domain = $("#d").value.trim();
+  if (!domain) { $("#e").textContent = "請先填入網域。"; return; }
+  $("#e").textContent = "";
+  $("#b").disabled = true;
+  $("#out").innerHTML = '<p class="pending"><span class="dot"></span>正在讀取 robots.txt、sitemap、首頁，並以三個 AI 讀取身分測試…</p>';
+  try {
+    const res = await fetch("/api/audit", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ domain }),
+    });
+    const data = await res.json();
+    if (!data.ok) { $("#out").innerHTML = ""; $("#e").textContent = data.error || "檢測失敗，請稍後再試。"; return; }
+    render(data.report);
+  } catch {
+    $("#out").innerHTML = "";
+    $("#e").textContent = "連線失敗，請稍後再試。";
+  } finally {
+    $("#b").disabled = false;
+  }
+});
+
+function radar(axes) {
+  const N = axes.length, R = 96, cx = 120, cy = 116;
+  const pt = (i, r) => {
+    const a = (-90 + (i * 360) / N) * Math.PI / 180;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+  const poly = (fn) => axes.map((_, i) => pt(i, fn(i)).map((v) => v.toFixed(1)).join(",")).join(" ");
+  const rings = [0.25, 0.5, 0.75, 1]
+    .map((f) => `<polygon points="${poly(() => R * f)}" fill="none" stroke="rgba(226,235,239,.17)"/>`).join("");
+  const spokes = axes.map((_, i) => {
+    const [x, y] = pt(i, R);
+    return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(226,235,239,.17)"/>`;
+  }).join("");
+  const data = poly((i) => (R * (axes[i].score ?? 0)) / 100);
+  const labels = axes.map((a, i) => {
+    const [x, y] = pt(i, R + 20);
+    return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle" font-size="10" fill="${a.measured ? "#aeb9c6" : "#5d6b7a"}">${esc(a.name.replace(/^(AI )?/, "").slice(0, 5))}</text>`;
+  }).join("");
+  return `<svg viewBox="0 0 240 232" width="100%" style="max-width:260px" role="img" aria-label="五軸雷達圖">
+    ${rings}${spokes}
+    <polygon points="${data}" fill="rgba(110,180,172,.22)" stroke="#6eb4ac" stroke-width="2" stroke-linejoin="round"/>
+    ${labels}</svg>`;
+}
+
+function render(r) {
+  const axes = r.axes;
+  const bars = axes.map((a) => {
+    if (!a.measured) {
+      return `<div class="axis unmeasured"><strong>${esc(a.name)}</strong>
+        <div class="track"></div><b>—</b>
+        <div class="note">${esc(a.note || "本階段未測")}</div></div>`;
+    }
+    return `<div class="axis"><strong>${esc(a.name)}</strong>
+      <div class="track"><i class="${band(a.score)}" style="width:${a.score}%"></i></div>
+      <b>${a.score}</b></div>`;
+  }).join("");
+
+  const findings = r.findings.length
+    ? r.findings.map((f) => `<article class="f">
+        <div class="lv ${f.level}">${LV[f.level] || f.level}</div>
+        <div><h3>${esc(f.title)}</h3>
+          <p><span>證據</span>${esc(f.evidence)}</p>
+          <p><span>為什麼重要</span>${esc(f.why)}</p></div></article>`).join("")
+    : '<p class="lead">三軸都沒有偵測到需要優先處理的問題。下一步的差異會出現在答案面與第三方佐證，那需要 PR2 採樣。</p>';
+
+  const s = r.stats;
+  $("#out").innerHTML = `
+    <div class="top">
+      <div>
+        <p class="kicker">${esc(r.host)} · ${esc(r.checkedAt.slice(0, 10))}</p>
+        ${bars}
+      </div>
+      <div style="text-align:center">
+        ${radar(axes)}
+        <div class="score ${band(r.overall)}">${r.overall}</div>
+        <div class="score-label"><b>三軸即時分數 / 100</b><br>另兩軸需 PR2 採樣</div>
+      </div>
+    </div>
+
+    <h2>檢測數據</h2>
+    <dl class="grid3">
+      <div><dt>AI 讀取身分</dt><dd>${r.agents.map((a) => a.status).join(" / ")}</dd></div>
+      <div><dt>可見文字</dt><dd>${s.words}</dd></div>
+      <div><dt>標題 H1 / H2 / H3+</dt><dd>${s.h1} / ${s.h2} / ${s.h3}</dd></div>
+      <div><dt>列表 / 表格</dt><dd>${s.lists} / ${s.tables}</dd></div>
+      <div><dt>圖片有說明</dt><dd>${s.imagesWithAlt} / ${s.images}</dd></div>
+      <div><dt>結構化資料</dt><dd>${r.schemaTypes.length} 種</dd></div>
+    </dl>
+    ${r.schemaTypes.length ? `<div class="chips">${r.schemaTypes.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>` : ""}
+
+    <h2>發現</h2>
+    ${findings}
+
+    <div class="bd">
+      <h3>本次邊界</h3>
+      <ul>${r.boundary.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+    </div>
+
+    <p class="cta">這份即時檢測只回答「AI 進不進得來、讀不讀得懂」。<br>
+      至於 AI 現在實際怎麼回答關於你的問題、競品拿走了哪些答案，需要固定題庫的跨平台採樣 —— 那是 PR2。
+      想談的話寄信到 <a href="mailto:hello@loginai.io">hello@loginai.io</a>。</p>`;
+  $("#out").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+</script>
+</body>
+</html>
