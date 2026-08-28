@@ -99,12 +99,60 @@ h2{font:500 clamp(22px,2.6vw,32px)/1.25 "Noto Serif TC",Georgia,serif;margin:52p
 .fineprint{color:var(--foot);font-size:11.5px;line-height:1.7;margin-top:18px;max-width:64ch}
 .fineprint a{color:var(--muted);text-decoration-color:var(--foot)}
 footer{color:var(--foot);font-size:11px;margin-top:64px}
+.pdfbtn{background:none;border:1px solid var(--line);color:var(--muted);font:inherit;font-size:13px;padding:9px 16px;cursor:pointer;margin-left:auto}
+.pdfbtn:hover{border-color:var(--gold);color:var(--gold)}
+.headrow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.printonly{display:none}
+
+/* ── 列印／另存 PDF ──────────────────────────────────────────
+   螢幕上是深色版面，印出來會吃掉整頁碳粉又難讀，所以整組反轉成淺色。
+   目標是一張 A4 裝得下：藏掉表單、加購區與裝飾，發現只留前四項。   */
+@media print{
+  @page{size:A4;margin:13mm 14mm}
+  html,body{background:#fff!important;color:#111!important;background-image:none!important;line-height:1.45}
+  .wrap{max-width:none;padding:0}
+  .kicker,form,.hint,.err,.hook,.cta,.pdfbtn,#f,h1,.rule,.lead,.pending,footer{display:none!important}
+  .printonly{display:block}
+  #out{margin-top:0}
+  .top{grid-template-columns:1fr 190px;gap:24px;border-top:0;padding-top:0;align-items:start}
+  .score{font-size:64px;color:#0d6e63!important}
+  .score.mid{color:#8a6d2d!important}.score.low{color:#a8332b!important}
+  .score-label{color:#555;font-size:11px;margin-top:6px}
+  .score-label b{color:#111}
+  .axis{grid-template-columns:120px 1fr 38px;gap:9px;margin:7px 0}
+  .axis strong{font-size:11px;color:#111}
+  .axis b{font-size:17px;color:#111}
+  .axis .track{height:8px;border-color:#bbb;background:#f2f2f2}
+  .axis .track i{background:#0d6e63}
+  .axis .track i.mid{background:#8a6d2d}.axis .track i.low{background:#a8332b}
+  .axis.unmeasured strong,.axis.unmeasured b{color:#999}
+  .axis .note{color:#888;font-size:9px}
+  h2{font-size:14px;margin:16px 0 8px;color:#111;page-break-after:avoid}
+  .grid3{border-color:#ddd;background:#ddd}
+  .grid3 div{background:#fafafa;padding:8px}
+  .grid3 dt{color:#777;font-size:9px}
+  .grid3 dd{font-size:14px;color:#111}
+  .chips{display:none}
+  .f{grid-template-columns:56px 1fr;gap:10px;padding:8px 0;border-color:#e0e0e0;page-break-inside:avoid}
+  .f:nth-of-type(n+5){display:none}
+  .f h3{font-size:12px;margin:0 0 4px;color:#111}
+  .f p{font-size:10px;margin:0 0 3px;color:#444;line-height:1.5}
+  .f p span{color:#8a6d2d;font-size:9px}
+  .lv{font-size:9px}
+  .lv.high{color:#a8332b}.lv.medium{color:#8a6d2d}.lv.low{color:#0d6e63}
+  .bd{border-color:#ccc;padding:10px 12px;margin-top:14px;page-break-inside:avoid}
+  .bd h3{color:#111;font-size:11px;margin:0 0 6px}
+  .bd ul{margin:0 0 0 16px}
+  .bd li{color:#555;font-size:9px;margin:2px 0}
+  svg text{fill:#555!important}
+  svg polygon[stroke]{stroke:#0d6e63!important}
+}
 @media(max-width:720px){.top{grid-template-columns:1fr;gap:26px}.axis{grid-template-columns:108px 1fr 38px;gap:9px}.f{grid-template-columns:1fr;gap:8px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <p class="kicker">LOGINAI / PR1 免費健檢</p>
+  <p class="kicker">LOGINAI / AI 能見度免費健檢</p>
   <h1>你的網站，AI 讀得到嗎？</h1>
   <div class="rule"></div>
   <p class="lead">輸入網域，我們用公開可驗證的方式檢查三件事：AI 爬蟲進不進得來、內容能不能被讀懂、有沒有一張機器看得懂的官方身分卡。不需要任何後台權限。</p>
@@ -118,7 +166,7 @@ footer{color:var(--foot);font-size:11px;margin-top:64px}
 
   <div id="out"></div>
 
-  <footer>LoginAi · PR1 免費健檢 · 本頁不索引任何受檢網站的內容</footer>
+  <footer>LoginAi · AI 能見度免費健檢 · 本頁不索引任何受檢網站的內容</footer>
 </div>
 
 <script>
@@ -194,19 +242,31 @@ function render(r) {
         <div><h3>${esc(f.title)}</h3>
           <p><span>證據</span>${esc(f.evidence)}</p>
           <p><span>為什麼重要</span>${esc(f.why)}</p></div></article>`).join("")
-    : '<p class="lead">三軸都沒有偵測到需要優先處理的問題。下一步的差異會出現在答案面與第三方佐證，那需要 PR2 採樣。</p>';
+    : '<p class="lead">三軸都沒有偵測到需要優先處理的問題。下一步的差異會出現在答案面與第三方佐證，那需要固定題庫的跨平台採樣。</p>';
 
   const s = r.stats;
   $("#out").innerHTML = `
+    <div class="printonly" style="border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <strong style="font-size:15px;color:#111">LoginAi · AI 能見度健檢</strong>
+        <span style="font-size:10px;color:#666">loginai.io</span>
+      </div>
+      <div style="font-size:11px;color:#444;margin-top:3px">${esc(r.host)}　檢測日期 ${esc(r.checkedAt.slice(0, 10))}</div>
+    </div>
+
     <div class="top">
       <div>
-        <p class="kicker">${esc(r.host)} · ${esc(r.checkedAt.slice(0, 10))}</p>
+        <div class="headrow">
+          <p class="kicker" style="margin:0">${esc(r.host)} · ${esc(r.checkedAt.slice(0, 10))}</p>
+          <button type="button" class="pdfbtn" id="pdfBtn">↓ 下載 PDF</button>
+        </div>
+        <div style="height:14px"></div>
         ${bars}
       </div>
       <div style="text-align:center">
         ${radar(axes)}
         <div class="score ${band(r.overall)}">${r.overall}</div>
-        <div class="score-label"><b>三軸即時分數 / 100</b><br>另兩軸需 PR2 採樣</div>
+        <div class="score-label"><b>三軸即時分數 / 100</b><br>另兩軸需跨平台採樣</div>
       </div>
     </div>
 
@@ -262,8 +322,17 @@ function render(r) {
     </section>
 
     <p class="cta">這份即時檢測只回答「AI 進不進得來、讀不讀得懂」。<br>
-      至於 AI 現在實際怎麼回答關於你的問題、競品拿走了哪些答案，需要固定題庫的跨平台採樣 —— 那是 PR2。
+      至於 AI 現在實際怎麼回答關於你的問題、競品拿走了哪些答案，需要固定題庫的跨平台採樣，屬於我們的付費診斷服務。
       想談的話寄信到 <a href="mailto:hello@loginai.io">hello@loginai.io</a>。</p>`;
+
+  // 用瀏覽器自己的列印功能輸出 PDF：中文字型不會出問題，也不必載入任何套件。
+  // 版面由 @media print 那段負責壓成一頁並轉成適合紙張的淺色。
+  $("#pdfBtn").addEventListener("click", () => {
+    const prev = document.title;
+    document.title = `LoginAi 健檢 ${r.host} ${r.checkedAt.slice(0, 10)}`;
+    window.print();
+    setTimeout(() => { document.title = prev; }, 600);
+  });
 
   initHook(r.host);
   $("#out").scrollIntoView({ behavior: "smooth", block: "start" });
