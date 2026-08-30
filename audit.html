@@ -214,10 +214,13 @@ function radar(axes) {
   }).join("");
   const data = poly((i) => (R * (axes[i].score ?? 0)) / 100);
   const labels = axes.map((a, i) => {
-    const [x, y] = pt(i, R + 20);
-    return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle" font-size="10" fill="${a.measured ? "#aeb9c6" : "#5d6b7a"}">${esc(a.name.replace(/^(AI )?/, "").slice(0, 5))}</text>`;
+    const [rawX, rawY] = pt(i, R + 12);
+    const x = Math.max(24, Math.min(216, rawX));
+    const y = Math.max(16, Math.min(218, rawY + 4));
+    const anchor = rawX < cx - 34 ? "start" : rawX > cx + 34 ? "end" : "middle";
+    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}" font-size="9.5" fill="${a.measured ? "#aeb9c6" : "#5d6b7a"}">${esc(a.name.replace(/^(AI )?/, "").slice(0, 5))}</text>`;
   }).join("");
-  return `<svg viewBox="0 0 240 232" width="100%" style="max-width:260px" role="img" aria-label="五軸雷達圖">
+  return `<svg viewBox="0 -8 240 244" width="100%" style="max-width:260px;overflow:visible" role="img" aria-label="五軸雷達圖">
     ${rings}${spokes}
     <polygon points="${data}" fill="rgba(110,180,172,.22)" stroke="#6eb4ac" stroke-width="2" stroke-linejoin="round"/>
     ${labels}</svg>`;
