@@ -213,11 +213,25 @@ function radar(axes) {
     return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(226,235,239,.17)"/>`;
   }).join("");
   const data = poly((i) => (R * (axes[i].score ?? 0)) / 100);
+  const labelLines = (name) => {
+    const clean = name.replace(/^(AI )?/, "");
+    return ({
+      "入口可讀性": ["入口", "可讀性"],
+      "內容閱讀條件": ["內容閱讀", "條件"],
+      "官方身分資料": ["官方身分", "資料"],
+      "公開搜尋答案面": ["公開搜尋", "答案面"],
+      "第三方佐證訊號": ["第三方佐證", "訊號"]
+    })[clean] || [clean];
+  };
   const labels = axes.map((a, i) => {
-    const [x, y] = pt(i, R + 28);
-    return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="${a.measured ? "#aeb9c6" : "#5d6b7a"}">${esc(a.name.replace(/^(AI )?/, "").slice(0, 5))}</text>`;
+    const [x, y] = pt(i, R + 36);
+    const lines = labelLines(a.name);
+    const tspans = lines.map((line, j) =>
+      `<tspan x="${x.toFixed(1)}" dy="${j ? 13 : 0}">${esc(line)}</tspan>`
+    ).join("");
+    return `<text x="${x.toFixed(1)}" y="${(y - (lines.length - 1) * 6 + 4).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="600" fill="${a.measured ? "#b8c5d3" : "#728195"}">${tspans}</text>`;
   }).join("");
-  return `<svg viewBox="-36 -28 312 288" width="100%" style="max-width:286px;overflow:visible" role="img" aria-label="五軸雷達圖">
+  return `<svg viewBox="-60 -42 360 322" width="100%" style="max-width:330px;overflow:visible" role="img" aria-label="五軸雷達圖">
     ${rings}${spokes}
     <polygon points="${data}" fill="rgba(110,180,172,.22)" stroke="#6eb4ac" stroke-width="2" stroke-linejoin="round"/>
     ${labels}</svg>`;
